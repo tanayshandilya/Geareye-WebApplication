@@ -1,6 +1,8 @@
 const express = require('express');
 const bp = require('body-parser');
+const fs = require('fs');
 const connection = require('./modules/database');
+const filename = './home.html';
 
 const port = process.env.PORT || 4800;
 const app = express();
@@ -9,9 +11,15 @@ app.use(bp.urlencoded({ extended: true }));
 app.use(bp.json());
 
 app.get('/', (req, res) => {
-	res.json({
-		message: 'Hello'
-	});
+	resp.writeHead(200, {"Content-Type":"text/html"});
+    fs.readFile(filename, "utf8", function (err, data) {
+        if (err) {
+        	res.send(err);
+        } else {
+        	resp.write(data);
+        }
+        });
+    resp.end();
 });
 
 app.get('/add/:rfid', (req, res) => {
