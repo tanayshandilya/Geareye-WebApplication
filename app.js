@@ -2,7 +2,7 @@ const express = require('express');
 const bp = require('body-parser');
 const fs = require('fs');
 const connection = require('./modules/database');
-const filename = './home.html';
+const filename = './index.html';
 
 const port = process.env.PORT || 4800;
 const app = express();
