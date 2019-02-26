@@ -16,7 +16,7 @@ app.get('/', (req, res) => {
         if (err) {
         	res.send(err);
         } else {
-        	resp.write(data);
+        	res.write(data);
         }
         });
     resp.end();
