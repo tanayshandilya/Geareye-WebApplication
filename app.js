@@ -11,7 +11,7 @@ app.use(bp.urlencoded({ extended: true }));
 app.use(bp.json());
 
 app.get('/', (req, res) => {
-	resp.writeHead(200, {"Content-Type":"text/html"});
+	res.writeHead(200, {"Content-Type":"text/html"});
     fs.readFile(filename, "utf8", function (err, data) {
         if (err) {
         	res.send(err);
@@ -19,7 +19,7 @@ app.get('/', (req, res) => {
         	res.write(data);
         }
         });
-    resp.end();
+    res.end();
 });
 
 app.get('/add/:rfid', (req, res) => {
