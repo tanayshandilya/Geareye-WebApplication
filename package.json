@@ -1,0 +1,24 @@
+{
+  "name": "svits-app",
+  "version": "1.0.0",
+  "description": "RFID Validator - Server Applicaion",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tanayshandilya/svits-app.git"
+  },
+  "author": "Tanay Shandilya",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/tanayshandilya/svits-app/issues"
+  },
+  "homepage": "https://github.com/tanayshandilya/svits-app#readme",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "mysql": "^2.16.0"
+  }
+}
