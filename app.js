@@ -13,13 +13,14 @@ app.use(bp.json());
 app.get('/', (req, res) => {
 	res.writeHead(200, {"Content-Type":"text/html"});
     fs.readFile(filename, "utf8", function (err, data) {
-        if (err) {
-        	res.send(err);
-        } else {
-        	res.write(data);
-        }
-        });
-    res.end();
+    if (!err) {
+    	res.write(data);
+    	res.end();
+    } else {
+    	res.write(err);
+    	res.end();
+    }
+    });
 });
 
 app.get('/add/:rfid', (req, res) => {
