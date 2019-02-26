@@ -23,33 +23,19 @@ app.get('/', (req, res) => {
     });
 });
 
-app.get('/add/:rfid', (req, res) => {
+app.get('/api/:rfid', (req, res) => {
 	connection.query('SELECT * FROM `rfid` WHERE `rfid` = ?', req.params.rfid, (err, result) => {
 		if (!err) {
 			if (result.length > 0) {
-				res.end('ID already registered');
+				res.end('already exists');
 			} else {
 				connection.query('INSERT INTO `rfid` ( `rfid` ) VALUES (?)', req.params.rfid, (err) => {
 					if (!err) {
-						res.end('Added successfully');
+						res.end('added successfully');
 					} else {
 						res.end(`SQL Error: ${err}`);
 					}
 				});
-			}
-		} else {
-			res.end(`SQL Error: ${err}`);
-		}
-	});
-});
-
-app.get('/validate/:rfid', (req, res) => {
-	connection.query('SELECT * FROM `rfid` WHERE `rfid` = ?', req.params.rfid, (err, result) => {
-		if (!err) {
-			if (result.length > 0) {
-				res.end('true');
-			} else {
-				res.end('false');
 			}
 		} else {
 			res.end(`SQL Error: ${err}`);
