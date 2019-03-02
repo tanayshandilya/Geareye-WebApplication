@@ -4,11 +4,16 @@ const fs = require('fs');
 const connection = require('./modules/database');
 const filename = './index.html';
 
-const port = process.env.PORT || 4800;
+const port = process.env.PORT || 3800;
 const app = express();
 
 app.use(bp.urlencoded({ extended: true }));
 app.use(bp.json());
+app.use(function(req, res, next) {
+	res.header("Access-Control-Allow-Origin", "*");
+	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+	next();
+});
 
 app.get('/', (req, res) => {
 	res.writeHead(200, {"Content-Type":"text/html"});
@@ -23,13 +28,15 @@ app.get('/', (req, res) => {
     });
 });
 
-app.get('/api/:rfid', (req, res) => {
-	connection.query('SELECT * FROM `rfid` WHERE `rfid` = ?', req.params.rfid, (err, result) => {
+app.get('/api/:rfid/:count', (req, res) => {
+	connection.query('SELECT * FROM `items` WHERE `item_rfid` = ?', req.params.rfid, (err, result) => {
 		if (!err) {
 			if (result.length > 0) {
 				res.end('already exists');
 			} else {
-				connection.query('INSERT INTO `rfid` ( `rfid` ) VALUES (?)', req.params.rfid, (err) => {
+				connection.query('INSERT INTO `items` ( `item_rfid`, `item_timestamp`, `item_position` ) VALUES (?,?,?)', 
+					[req.params.rfid, new Date(), req.params.count], 
+				(err) => {
 					if (!err) {
 						res.end('added successfully');
 					} else {
@@ -39,6 +46,43 @@ app.get('/api/:rfid', (req, res) => {
 			}
 		} else {
 			res.end(`SQL Error: ${err}`);
+		}
+	});
+});
+
+app.post('/app/api/sync', (req, res) => {
+	connection.query('SELECT * FROM `items` ORDER BY `item_position`', (err, result) => {
+		if (!err) {
+			if ( result.length > 0 ) {
+				res.json({
+					status: 'success',
+					data: result
+				});
+			} else {
+				res.json({
+					status: 'no-data'
+				});
+			}
+		} else {
+			res.json({
+				status: 'error',
+				message: err
+			});
+		}
+	});
+});
+
+app.post('/app/api/update/:item_rfid', (req, res) => {
+	connection.query('UPDATE `items` SET `'+req.body.property+'`= ? WHERE `item_rfid` = ?', [req.body.value, req.params.item_rfid], (err) => {
+		if (!err) {
+			res.json({
+				status: 'success'
+			});
+		} else {
+			res.json({
+				status: 'error',
+				message: err
+			});
 		}
 	});
 });
