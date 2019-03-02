@@ -32,7 +32,13 @@ app.get('/api/:rfid/:count', (req, res) => {
 	connection.query('SELECT * FROM `items` WHERE `item_rfid` = ?', req.params.rfid, (err, result) => {
 		if (!err) {
 			if (result.length > 0) {
-				res.end('already exists');
+				connection.query('UPDATE `items` SET `item_state`= "varified" WHERE `item_rfid` = ?', req.params.rfid, (err) => {
+					if (!err) {
+						res.end('already exists');
+					} else {
+						res.end('already exists');
+					}
+				});
 			} else {
 				connection.query('INSERT INTO `items` ( `item_rfid`, `item_timestamp`, `item_position` ) VALUES (?,?,?)', 
 					[req.params.rfid, new Date(), req.params.count], 
@@ -82,6 +88,20 @@ app.post('/app/api/update/:item_rfid', (req, res) => {
 			res.json({
 				status: 'error',
 				message: err
+			});
+		}
+	});
+});
+
+app.post('/app/api/truncate', (req, res) => {
+	connection.query('TRUNCATE TABLE `items`;', (err) => {
+		if (!err) {
+			res.json({
+				status: 'success'
+			});
+		} else {
+			res.json({
+				status: 'error'
 			});
 		}
 	});
