@@ -121,7 +121,7 @@
             $.post('/app/api/truncate',(resp)=>{
                 if(resp.status === 'success'){
                     $('app-main').empty();
-                    $(`<app-waiting style="display: none;text-align: center;">
+                    $(`<app-waiting style="display: block;text-align: center;">
                             <img src="/add-icon.svg" style="height: 120px;margin-bottom: 1em;">
                             <h2>Waiting for items to be added</h2>
                         </app-waiting>`).appendTo('app-main').fadeIn();
