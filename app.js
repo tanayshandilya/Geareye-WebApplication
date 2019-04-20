@@ -22,6 +22,8 @@ app.get('/checklist', (req, res) => {
 				res.render('checklist', {
 					items: result
 				});
+			}else{
+				res.redirect('/');
 			}
 		}
 	});
