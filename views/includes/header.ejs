@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>GearEye App</title>
+    <style>
+        * {
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+        }
+        body {
+            margin: 0;
+            background-color: #121211;
+        }
+        app-header {
+            display: grid;
+            color: #fff;
+            background-color: rgba(40, 40, 40, .8);
+            grid-template-columns: 1fr 1fr;
+            box-shadow: 0 2px 5px 0 rgba(0,0,0,0.5); 
+        }
+        app-brand {
+            padding: 0.5em;
+            font-size: 27px;
+        }
+        #nav-toggle {
+            float: right;
+            display: block;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+        #nav-toggle:focus {
+            outline: none;
+        }
+        app-nav {
+            top: 0;
+            right: 0;
+            width: 60vw;
+            height: 100vh;
+            display: block;
+            position: fixed;
+            grid-gap: 1em;
+            padding: 3em 2em;
+            transform: translateX(100%);
+            background-color: #1c1c1c;
+            transition: all 0.3s ease-in-out;
+            box-shadow: -10px 0px 16px -4px rgba(0,0,0,0.5);
+        }
+        app-nav-bg {
+            position: absolute;
+            display: none;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0,0,0,0.5);
+        }
+        a.nav-link {
+            cursor: pointer;
+            display: block;
+            text-align: center;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-decoration: none;
+            padding: 0.5em;
+            margin: 0.5em 0;
+            color: #fff;
+            border-radius: 3px;
+            background-color: #2196F3;
+            box-shadow: 0 2px 5px -2px rgba(0,0,0,0.2);
+            transition: all 0.4s ease-in-out;
+        }
+        a.nav-link:hover,a.nav-link:focus {
+            background-color: #1565C0;
+            box-shadow: 0 8px 10px -2px rgba(0,0,0,0.2);
+            transition: all 0.4s ease-in-out;
+        }
+        app-nav.active {
+            transition: all 0.3s ease-in-out;
+            transform: translateX(0%);
+        }
+    </style>
+</head>
+<body>
+    <app-header>
+        <app-brand>
+            <a href="/" style="text-decoration:none;color: #fff">GearEye</a>
+        </app-brand>
+        <app-menu-toogle style="padding: 0.7em  3em;">
+            <button id="nav-toggle">
+                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" width="35px" height="35px" viewBox="0 0 124 124" style="margin-bottom: -13px;" xml:space="preserve">
+                    <g>
+                        <path fill="#fff" d="M112,6H12C5.4,6,0,11.4,0,18s5.4,12,12,12h100c6.6,0,12-5.4,12-12S118.6,6,112,6z"></path>
+                        <path fill="#fff" d="M112,50H12C5.4,50,0,55.4,0,62c0,6.6,5.4,12,12,12h100c6.6,0,12-5.4,12-12C124,55.4,118.6,50,112,50z"></path>
+                        <path fill="#fff" d="M112,94H12c-6.6,0-12,5.4-12,12s5.4,12,12,12h100c6.6,0,12-5.4,12-12S118.6,94,112,94z"></path>
+                    </g>
+                </svg>
+            </button>
+        </app-menu-toogle>
+    </app-header>
+    <app-nav-bg></app-nav-bg>
+    <app-nav>
+        <a href="/" class="nav-link">Home</a>
+        <a href="/checklist" class="nav-link">Checklist</a>
+        <a onclick="truncateList()" class="nav-link">Clear List</a>
+    </app-nav>
+    <script type="text/javascript" src="/jquery.min.js"></script>
+    <script type="text/javascript">
+        $('#nav-toggle').on('click', ()=>{
+            $('app-nav').toggleClass('active');
+            $('app-nav-bg').fadeToggle();
+        });
+        $('app-nav-bg').on('click', ()=>{
+            $('app-nav').toggleClass('active');
+            $('app-nav-bg').fadeToggle();
+        });
+        const truncateList = ()=>{
+            $.post('/app/api/truncate',(resp)=>{
+                if(resp.status === 'success'){
+                    $('app-main').empty();
+                    $(`<app-waiting style="display: none;text-align: center;">
+                            <img src="/add-icon.svg" style="height: 120px;margin-bottom: 1em;">
+                            <h2>Waiting for items to be added</h2>
+                        </app-waiting>`).appendTo('app-main').fadeIn();
+                }
+            });
+        }
+    </script>

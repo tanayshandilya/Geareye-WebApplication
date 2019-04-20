@@ -1,0 +1,102 @@
+<% include includes/header %>
+    <style>
+        app-main {
+            display: block;
+            padding: 1.5em 1.5em;
+        }
+        app-item {
+            display: grid;
+            padding: 0.8em;
+            margin-bottom: 1em;
+            border-radius: 3px;
+            background-color: #2d2d2d;
+            grid-template-columns: 1fr 7fr;
+            box-shadow: 0 5px 8px -2px rgba(0,0,0,0.5);
+        }
+        h2 {
+            margin: 0 0 8px 0;
+            color: #fff;
+        }
+        h5{
+            margin: 0;
+            color: #9c9c9c;
+        }
+        .item-input {      
+            border: 0;
+            color: #fff;
+            font-size: 20px;
+            padding: 0.35em;
+            border-radius: 3px;
+            display: inline-block;
+            background-color: #4e4e4e;
+            box-shadow: none;
+            transition: all 0.4s ease-in-out;
+        }
+        .item-input:focus {
+            outline: none;
+            box-shadow: 0 8px 10px -2px rgba(0,0,0,0.2);
+            transition: all 0.4s ease-in-out;
+        }
+        .item-btn {
+            outline: none;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            font-size: 16px;
+            background-color: #2196F3;
+            padding: 0.55em 0.8em;
+            border-radius: 3px;
+            transition: all 0.4s ease-in-out;
+        }
+        .item-btn:focus, .item-btn:hover {
+            outline: none;
+            box-shadow: 0 8px 10px -2px rgba(0,0,0,0.2);
+            transition: all 0.4s ease-in-out;
+        }
+    </style>
+    <app-main></app-main>
+<script type="text/javascript">
+    const appMain = $('app-main');
+    const updateItemName = (uuid)=>{
+        let newName = $(`input[name="item-${uuid}"]`).val(), parentNode = $(`#ic-${uuid}`);
+        $.post(`/app/api/update/${uuid}`, {property: 'item_name',value: newName}, (resp)=>{
+            if(resp.status === 'success') {
+                $(`#fc-${uuid}`).remove();
+                $(`<h2 style="display:none">${newName}</h2>`).prependTo(parentNode).fadeIn();
+            }else{
+                $(`<text style="color:#f44336;display: none;">Error while saving name<text>`).appendTo(`#fc-${uuid}>h2`).fadeIn().delay(800).fadeOut();
+            }
+        });
+    };
+    const syncItems = ()=>{
+        $.post('/app/api/sync',(resp)=>{
+            if(resp.status === 'success') {
+                if(document.querySelector('app-waiting')){
+                    $('app-waiting').fadeOut().delay(500).remove();
+                }
+                resp.data.forEach(e => {
+                    if(!document.querySelector(`#i-${e.item_rfid}`)){
+                        let item_name = (!e.item_name||e.item_name=='no-name') ? `<div id="fc-${e.item_rfid}" style="display: flex; margin-bottom: 8px"><input class="item-input" placeholder="Add Item Name" name="item-${e.item_rfid}"><button onclick="updateItemName('${e.item_rfid}')" class="item-btn" type="button">Save</button></div>` : `<h2>${e.item_name}</h2>`;
+                        $(`<app-item style="display:none" id="i-${e.item_rfid}">
+                            <img src="/item-icon.svg" style="height: 50px;">
+                            <app-item-content id="ic-${e.item_rfid}">
+                                ${item_name}
+                                <h5>${e.item_rfid}</h5>    
+                            </app-item-content>
+                        </app-item>`).appendTo(appMain).fadeIn();
+                    }
+                });
+            }else{
+                if(!document.querySelector('app-waiting')){
+                $(`<app-waiting style="display: block;text-align: center;">
+                            <img src="/add-icon.svg" style="height: 120px;margin-bottom: 1em;">
+                            <h2>Waiting for items to be added</h2>
+                        </app-waiting>`).appendTo('app-main').fadeIn();
+                }
+            }
+        });
+    }
+    syncItems();
+    setInterval(syncItems,2000);
+</script>
+<% include includes/footer %>

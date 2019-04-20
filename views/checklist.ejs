@@ -1,0 +1,93 @@
+<% include includes/header %>
+    <style>
+        app-main {
+            display: block;
+            padding: 1.5em 1.5em;
+        }
+        app-item {
+            display: grid;
+            padding: 0.8em;
+            margin-bottom: 1em;
+            border-radius: 3px;
+            background-color: transparent;
+            grid-template-columns: 1fr 7fr;
+            transition: all 0.35s ease-in-out;
+            box-shadow: 0 5px 8px -2px rgba(0,0,0,0.5);
+        }
+        .danger {
+          transition: all 0.35s ease-in-out;
+          background-color: #f44336;
+        }
+        .success {
+          transition: all 0.35s ease-in-out;
+          background-color: #4caf50;
+        }
+        h2 {
+            margin: 0 0 8px 0;
+            color: #fff;
+        }
+        h5{
+            margin: 0;
+            color: #212121;
+        }
+        .item-input {      
+            border: 0;
+            color: #fff;
+            font-size: 20px;
+            padding: 0.35em;
+            border-radius: 3px;
+            display: inline-block;
+            background-color: #4e4e4e;
+            box-shadow: none;
+            transition: all 0.4s ease-in-out;
+        }
+        .item-input:focus {
+            outline: none;
+            box-shadow: 0 8px 10px -2px rgba(0,0,0,0.2);
+            transition: all 0.4s ease-in-out;
+        }
+        .item-btn {
+            outline: none;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            font-size: 16px;
+            background-color: #2196F3;
+            padding: 0.55em 0.8em;
+            border-radius: 3px;
+            transition: all 0.4s ease-in-out;
+        }
+        .item-btn:focus, .item-btn:hover {
+            outline: none;
+            box-shadow: 0 8px 10px -2px rgba(0,0,0,0.2);
+            transition: all 0.4s ease-in-out;
+        }
+    </style>
+    <app-main>
+      <% for(let i = 0; i < items.length; i++){ %>
+        <app-item id="i-<%= items[i].item_rfid %>" class="<% if(items[i].item_state==='added'){ %>danger<% }else{ %>success<% } %>">
+            <img src="/item-icon.svg" style="height: 50px;">
+            <app-item-content id="ic-<%= items[i].item_rfid %>">
+                <h2><%= items[i].item_name %></h2>
+                <h5><%= items[i].item_rfid %></h5>
+            </app-item-content>
+        </app-item>
+      <% } %>
+    </app-main>
+<script type="text/javascript">
+    const appMain = $('app-main');
+    const syncItems = ()=>{
+      $.post('/app/api/sync',(resp)=>{
+        if(resp.status === 'success') {
+          resp.data.forEach(e => {
+            if(e.item_state === 'varified'){
+              $(`#i-${e.item_rfid}`).addClass('success');
+            } 
+          });
+        }
+      });
+    }
+    syncItems();
+    setInterval(syncItems,1500);
+</script>
+<% include includes/footer %>

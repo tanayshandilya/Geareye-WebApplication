@@ -1,31 +1,30 @@
+const path = require('path');
 const express = require('express');
 const bp = require('body-parser');
-const fs = require('fs');
 const connection = require('./modules/database');
-const filename = './index.html';
 
 const port = process.env.PORT || 3800;
 const app = express();
 
 app.use(bp.urlencoded({ extended: true }));
 app.use(bp.json());
-app.use(function(req, res, next) {
-	res.header("Access-Control-Allow-Origin", "*");
-	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-	next();
-});
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+app.use(express.static(path.join(__dirname, 'static')));
 
 app.get('/', (req, res) => {
-	res.writeHead(200, {"Content-Type":"text/html"});
-    fs.readFile(filename, "utf8", function (err, data) {
-    if (!err) {
-    	res.write(data);
-    	res.end();
-    } else {
-    	res.write(err);
-    	res.end();
-    }
-    });
+	res.render('home');
+});
+app.get('/checklist', (req, res) => {
+	connection.query('SELECT * FROM `items` ORDER BY `item_position`', (err, result)=>{
+		if(!err){
+			if(result.length){
+				res.render('checklist', {
+					items: result
+				});
+			}
+		}
+	});
 });
 
 app.get('/api/:rfid/:count', (req, res) => {
